@@ -10,7 +10,7 @@
 </template>
 
 <script lang="ts">
-import { ref, onMounted, defineComponent, computed, reactive, Ref } from 'vue';
+import { ref, onMounted, defineComponent, reactive, Ref } from 'vue';
 import MarqueeText from 'vue-marquee-text-component';
 
 export default defineComponent({
@@ -37,29 +37,12 @@ export default defineComponent({
       }
     };
 
-    const tickerDuration = computed(() => {
-      if (tickerContainer.value && state.news.length) {
-        const contentWidth = tickerContainer.value.scrollWidth;
-        const soma = state.news.reduce(
-          (acumulador: any, valorAtual): number => {
-            return acumulador + valorAtual.length;
-          },
-          0
-        );
-
-        return contentWidth / 1000;
-      } else {
-        return 0;
-      }
-    });
-
     onMounted(async () => {
       await fetchNews();
     });
 
     return {
       state,
-      tickerDuration,
       tickerContainer,
       newsLoaded,
     };
@@ -68,15 +51,6 @@ export default defineComponent({
 </script>
 
 <style scoped>
-@keyframes marquee {
-  0% {
-    transform: translateX(100%);
-  }
-  100% {
-    transform: translateX(-100%);
-  }
-}
-
 .news-ticker {
   overflow: hidden;
   white-space: nowrap;

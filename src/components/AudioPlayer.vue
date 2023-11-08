@@ -10,9 +10,9 @@
       class="hidden"
     ></audio>
 
-    <div class="w-full h-40 overflow-hidden bg-zinc-900 flex justify-center" >
-      <img :src="metadata?.capa_musica" alt="" v-if="metadata?.capa_musica">
-      <img :src="defaultCover" v-else>
+    <div class="w-full h-40 overflow-hidden bg-zinc-900 flex justify-center">
+      <img :src="metadata?.capa_musica" alt="" v-if="metadata?.capa_musica" />
+      <img :src="defaultCover" v-else />
     </div>
     <div class="flex justify-center items-center gap-2 px-8 py-4">
       <div class="flex gap-2">
@@ -51,37 +51,35 @@
     </div>
 
     <div class="text-center py-2 border-t border-green-700 px-4">
-      <h3 class="text-white max-w-[320px]">{{ metadata?.musica_atual || 'Carregando informações...'}}</h3>
+      <h3 class="text-white max-w-[320px]">
+        {{ metadata?.musica_atual || 'Carregando informações...' }}
+      </h3>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted } from 'vue';
 import {
   PlayIcon,
   PauseIcon,
   Volume1Icon,
   Volume2Icon,
   RefreshCwIcon,
-} from "lucide-vue-next";
+} from 'lucide-vue-next';
 import defaultCover from '../assets/cover.png';
 
 const isPlaying = ref(false);
-const audioStreamURL = "https://stm2.xcast.com.br:11186/stream";
+const audioStreamURL = 'https://stm2.xcast.com.br:11186/stream';
 const audioPlayer = ref<HTMLAudioElement>();
-const horaAtual = ref("");
+const horaAtual = ref('');
 const intervalID = ref();
 const intervalIDMetadata = ref();
 const metadata = ref<any>();
 
-
-const cover = computed(() => {
-  return metadata?.capa_musica || defaultCover
-})
 const atualizarHora = () => {
-  const horaMaceio = new Date().toLocaleTimeString("pt-BR", {
-    timeZone: "America/Maceio",
+  const horaMaceio = new Date().toLocaleTimeString('pt-BR', {
+    timeZone: 'America/Maceio',
   });
   horaAtual.value = horaMaceio;
 };
@@ -114,7 +112,7 @@ const decreaseVolume = () => {
 
 const updateToCurrentTime = () => {
   if (audioPlayer.value) {
-    audioPlayer.value.src = ""; // Limpa o src atual
+    audioPlayer.value.src = ''; // Limpa o src atual
     audioPlayer.value.load(); // Força o elemento audio a recarregar
     audioPlayer.value.src = audioStreamURL; // Define o src com o novo stream
     audioPlayer.value.play(); // Inicia a reprodução do novo stream
@@ -129,7 +127,7 @@ const fetchMetadata = async () => {
 
     if (response.ok) {
       const data = await response.json();
-      return data; 
+      return data;
     } else {
       throw new Error('Erro ao obter os dados');
     }
@@ -141,7 +139,7 @@ const fetchMetadata = async () => {
 
 const updateMetaData = async () => {
   metadata.value = await fetchMetadata();
-}
+};
 
 onMounted(() => {
   intervalID.value = setInterval(atualizarHora, 1000);
@@ -151,13 +149,13 @@ onMounted(() => {
   updateMetaData();
 
   if (audioPlayer.value) {
-    audioPlayer.value.addEventListener("play", () => {
+    audioPlayer.value.addEventListener('play', () => {
       isPlaying.value = true;
     });
-    audioPlayer.value.addEventListener("pause", () => {
+    audioPlayer.value.addEventListener('pause', () => {
       isPlaying.value = false;
     });
-    audioPlayer.value.addEventListener("", () => {
+    audioPlayer.value.addEventListener('', () => {
       isPlaying.value = false;
     });
 
