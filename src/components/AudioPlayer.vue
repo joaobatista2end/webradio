@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-green-900 inline-block rounded-lg">
+  <div class="bg-green-900 inline-block rounded-lg overflow-hidden">
     <audio
       ref="audioPlayer"
       controls
@@ -9,7 +9,12 @@
       :src="audioStreamURL"
       class="hidden"
     ></audio>
-    <div class="flex items-center gap-2 px-8 py-4">
+
+    <div class="w-full h-40 overflow-hidden bg-zinc-900 flex justify-center" >
+      <img :src="metadata?.capa_musica" alt="" v-if="metadata?.capa_musica">
+      <img :src="defaultCover" v-else>
+    </div>
+    <div class="flex justify-center items-center gap-2 px-8 py-4">
       <div class="flex gap-2">
         <button
           @click="decreaseVolume"
@@ -26,9 +31,6 @@
         </button>
       </div>
 
-      <!-- <div class="h-20 w-20 bg-green-950 rounded-md">
-        <img :src="coverImage" alt="" />
-      </div> -->
       <div class="flex gap-2">
         <button
           @click="togglePlay"
@@ -48,14 +50,14 @@
       </div>
     </div>
 
-    <div class="text-center py-2 border-t border-green-700">
-      <h3 class="text-white">{{ horaAtual }}</h3>
+    <div class="text-center py-2 border-t border-green-700 px-4">
+      <h3 class="text-white max-w-[320px]">{{ metadata?.musica_atual || 'Carregando informações...'}}</h3>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import {
   PlayIcon,
   PauseIcon,
@@ -63,12 +65,20 @@ import {
   Volume2Icon,
   RefreshCwIcon,
 } from "lucide-vue-next";
+import defaultCover from '../assets/cover.png';
+
 const isPlaying = ref(false);
 const audioStreamURL = "https://stm2.xcast.com.br:11186/stream";
 const audioPlayer = ref<HTMLAudioElement>();
 const horaAtual = ref("");
 const intervalID = ref();
+const intervalIDMetadata = ref();
+const metadata = ref<any>();
 
+
+const cover = computed(() => {
+  return metadata?.capa_musica || defaultCover
+})
 const atualizarHora = () => {
   const horaMaceio = new Date().toLocaleTimeString("pt-BR", {
     timeZone: "America/Maceio",
@@ -111,11 +121,34 @@ const updateToCurrentTime = () => {
   }
 };
 
+const fetchMetadata = async () => {
+  const url = 'https://xcast.com.br/api-json/VkZaU1JtVkZPVVZYVkRBOStS';
+
+  try {
+    const response = await fetch(url);
+
+    if (response.ok) {
+      const data = await response.json();
+      return data; 
+    } else {
+      throw new Error('Erro ao obter os dados');
+    }
+  } catch (error) {
+    console.error('Ocorreu um erro:', error);
+    return null;
+  }
+};
+
+const updateMetaData = async () => {
+  metadata.value = await fetchMetadata();
+}
+
 onMounted(() => {
   intervalID.value = setInterval(atualizarHora, 1000);
+  intervalIDMetadata.value = setInterval(updateMetaData, 50000);
 
-  // Atualiza a hora imediatamente ao montar o componente
   atualizarHora();
+  updateMetaData();
 
   if (audioPlayer.value) {
     audioPlayer.value.addEventListener("play", () => {
@@ -133,6 +166,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  clearInterval(intervalID.value); // Limpa o intervalo quando o componente for desmontado
+  clearInterval(intervalID.value);
+  clearInterval(intervalIDMetadata.value);
 });
 </script>
