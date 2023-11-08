@@ -1,7 +1,10 @@
 <template>
-  <div class="news-ticker bg-blue-700 text-yellow-500" ref="tickerContainer">
+  <div
+    class="news-ticker bg-green-900 text-yellow-500 font-bold"
+    ref="tickerContainer"
+  >
     <marquee-text :duration="6000">
-      {{ state.news.join(' ]--------------[ ') }}
+      {{ state.news.join('• ───────────────── •') }}
     </marquee-text>
   </div>
 </template>
