@@ -27,7 +27,7 @@ export default defineComponent({
     const fetchNews = async () => {
       try {
         const data: any = await fetch(
-          'http://servicodados.ibge.gov.br/api/v3/noticias?tipo=noticia'
+          'https://servicodados.ibge.gov.br/api/v3/noticias?tipo=noticia'
         ).then((response) => response.json());
         state.news = data?.items.map((noticia: any) => noticia.titulo) || [];
         newsLoaded.value = true; // News are loaded
